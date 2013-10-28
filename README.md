@@ -1,4 +1,4 @@
-lib
+DCPU-Library
 ===
 
 A Library of functions in assembly for use on the DCPU-16.
