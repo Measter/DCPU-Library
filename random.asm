@@ -2,9 +2,13 @@
 ; Title: 	Random Number Generator.
 ; Author: 	Measter
 ; Date:		14/09/13
+; 
+; Revisions
+; 1  -  Initial release.
+; 2  -  Only include dword_mul instead of entire maths library.
 ; -----------------------
 
-.include <dword_maths.asm>
+.include <maths/dword_mul.asm>
 
 ; Seed for the generator.
 :rand_seed
