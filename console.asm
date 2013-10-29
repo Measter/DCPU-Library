@@ -1,8 +1,25 @@
 ; -----------------------
 ; Title: 	Console
 ; Author: 	Measter
-; Date:		04/09/13
+; Date:		2013/10/29
 ; -----------------------
+
+; Revisions
+; 1  :  Initial Release.
+; 2  :  Added support for arbitrary sizes.
+; 3  :  Added macro.
+
+.macro console_scroll_buffer ( pointer )
+	set push, pointer
+		jsr console_scroll_buffer_func
+	add sp, 1
+.endmacro
+.macro console_write_line ( msg_ptr, cnsl_ptr)
+	set push, msg_ptr
+	set push, cnsl_ptr
+		jsr console_write_line_func
+	add sp, 2
+.endmacro
 
 ;LEM1802 Console data structure.
 ; +0 		: Port ID.
@@ -18,7 +35,7 @@
 ; Scrolls the lines of the buffer up by 1
 ; Input
 ; SP+0 			: Address to the console data struct.
-:console_scroll_buffer
+:console_scroll_buffer_func
 	set push, z
 	set z, sp
 	add z, 2
@@ -73,7 +90,7 @@
 ; SP+1 			: Address to the ASCII values of the next line.
 ;				: 0-terminated string.
 ; SP+0 			: Address to the console data struct.
-:console_write_line
+:console_write_line_func
 	set push, z
 	set z, sp
 	add z, 2
@@ -84,9 +101,7 @@
 	set push, a
 
 		; Scroll the buffer.
-		set push, [z]
-			jsr console_scroll_buffer
-		add sp, 1
+		console_scroll_buffer([z])
 
 		set a, [z]
 		; A = Console data struct address.

@@ -1,9 +1,27 @@
 ; --------------------------------------------
 ; Title:   Memory Alloc
 ; Author:  Measter
-; Date:    2013/10/24
-; Version: 1.1
+; Date:    2013/10/29
 ; --------------------------------------------
+
+; Revisions
+; 1  :  Initial Release.
+; 2  :  Removed use of memory_end.asm
+; 3  :  Added macros.
+
+.macro set_heap(ptr)
+	set [mem_start], ptr
+.endmacro
+.macro mem_alloc ( size, dest )
+	set push, size
+		jsr mem_alloc_func
+	set dest, pop
+.endmacro
+.macro mem_free ( ptr )
+	set push, ptr
+		jsr mem_free_func
+	set ptr, pop
+.endmacro
 
 ;Allocated memory header definition.
 ; +0 		:  Magic number. (0x6D61)
@@ -27,7 +45,7 @@
 ; SP+0 : Size of memory to allocate.
 ;Output
 ; SP+0 : Memory address. 0xFFFF if out of memory.
-:mem_alloc
+:mem_alloc_func
 	set push, z
 	set z, sp
 	add z, 2
@@ -150,7 +168,7 @@
 ; SP+0 : Address of memory to free.
 ;Output
 ; SP+0 : 0x0000 if all went well, 0xFFFF if error.
-:mem_free
+:mem_free_func
 	set push, z
 	set z, sp
 	add z, 2

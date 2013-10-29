@@ -1,8 +1,21 @@
 ; -----------------------
 ; Title: 	Integer > Text Converter
 ; Author: 	Measter
-; Date:		04/09/13
+; Date:	   2013/10/29
 ; -----------------------
+
+; Revisions
+; 1  :  Initial Release.
+; 2  :  Generalised function.
+; 3  :  Added macro.
+
+.macro int_text_conv (buffer, value, base)
+	set push, buffer
+	set push, value
+	set push, base
+		jsr int_text_conv_func
+	add sp, 3
+.endmacro
 
 ; Converts a value to ASCII output.
 ; Maximum output is 5 digits.
@@ -11,7 +24,7 @@
 ; 	SP+2 : Buffer address to store output.
 ;	SP+1 : Value to convert.
 ; 	SP+0 : Base to convert to. Must be between 2 and 36.
-:int_text_conv
+:int_text_conv_func
 	set push, z
 	set z, sp
 	add z, 2

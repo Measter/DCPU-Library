@@ -1,15 +1,27 @@
 ; -----------------------
 ; Title: 	Memory Fill
 ; Author: 	Measter
-; Date:		2013/10/24
+; Date:		2013/10/29
 ; -----------------------
+
+; Revisions
+; 1  :  Initial Release.
+; 2  :  Added macro.
+
+.macro mem_fill ( start, val, len)
+	set push, start
+	set push, val
+	set push, len
+		jsr mem_fill_func
+	add sp, 3
+.endmacro
 
 ; Fills a section of memory with a given value.
 ; Input
 ; SP+2 		: Start location.
 ; SP+1 		: Value to fill.
 ; SP+0 		: Length of memory to copy.
-:mem_fill
+:mem_fill_func
 	set push, z
 	set z, sp
 	add z, 2

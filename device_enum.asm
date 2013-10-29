@@ -1,15 +1,27 @@
 ; --------------------------------------------
 ; Title:   Device Enumerator
 ; Author:  Measter
-; Date:    04/11/2012
-; Version: 1.0
-; --------------------------------------------
+; Date:	   2013/10/29
+; -----------------------
+
+; Revisions
+; 1  :  Initial Release.
+; 2  :  Added macro.
 
 .include <memory/alloc.asm>
 
+.macro enum_devices(byte1, byte2, out)
+	set push, byte2
+	set push, byte1
+		jsr enum_devices_func
+	set out, pop
+	add sp, 1
+.endmacro
+
 ; Device structure definition.
 ; +0+	: Type ID.
-; +1~ 	: Port numbers.
+; +1 	: Number of devices.
+; +2~ 	: Port numbers.
 
 ; Type IDs
 ; 0: Clock 				: 0x12d0, 0xb402
@@ -26,7 +38,7 @@
 ;	SP+0 : First ID byte.
 ; Output
 ;	SP+0 : Address of the list. 0xFFFF if error.
-:enum_devices
+:enum_devices_func
 	set push, z
 	set z, sp
 	add z, 2
@@ -67,9 +79,7 @@
 		set a, j
 		add a, 2
 		; A = Space needed.
-		set push, a
-			jsr mem_alloc
-		set a, pop
+		mem_alloc(a, a)
 
 		; Set Type ID. See above table.
 		:.type_id_table

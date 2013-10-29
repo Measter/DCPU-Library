@@ -1,10 +1,36 @@
 ; -----------------------
 ; Title: 	Queue
 ; Author: 	Measter
-; Date:		20/10/13
+; Date:	    2013/10/29
 ; -----------------------
 
+; Revisions
+; 1  :  Initial Release.
+; 2  :  Added macro.
+
 .include <memory/alloc.asm>
+
+.macro create_queue(dest)
+	set push, 0
+		jsr create_queue_func
+	set dest, pop
+.endmacro
+.macro delete_queue (ptr)
+	set push, ptr
+		jsr delete_queue_func
+	set ptr, pop
+.endmacro
+.macro pop_queue (queue_ptr, data)
+	set push, queue_ptr
+		jsr pop_queue_func
+	set data, pop
+.endmacro
+.macro push_queue (queue_ptr, data, err)
+	set push, queue_ptr
+	set push, data
+		jsr push_queue_func
+	set err, pop
+.endmacro
 
 ; Queue Header Structure.
 ; +0		: Number of items in queue.
@@ -20,15 +46,13 @@
 ; SP+0 		: None.
 ; Output
 ; SP+0 		: Address of queue header. Will return 0xFFFF on error.
-:create_queue
+:create_queue_func
 	set push, z
 	set z, sp
 	add z, 2
 	
 	; Memory for header.
-	set push, 0x3
-		jsr mem_alloc
-	set [z], pop
+	mem_alloc(0x3, [z])
 	set z, [z]	; Z = address of queue header.
 
 	; Unable to allocate.
@@ -48,7 +72,7 @@
 ; SP+0 		: Address of header.
 ; Output
 ; SP+0 		: 0xFFFF if error, else 0x0.
-:delete_queue
+:delete_queue_func
 	set push, z
 	set z, sp
 	add z, 2
@@ -61,17 +85,14 @@
 
 	; Delete contents.
 	:.empty_loop_start
-		set push, a
-			jsr pop_queue
-		set b, pop
+		pop_queue (a, b)
 		ifg [a+0], 0
 			set pc, .empty_loop_start
 		:.empty_loop_exit
 
 	:.delete_header
-	set push, a
-		jsr mem_free
-	set [z], pop
+	mem_free (a)
+	set [z], a
 
 	set b, pop
 	set a, pop
@@ -83,7 +104,7 @@
 ; SP+0 		: Queue header.
 ; Output
 ; SP+0 		: Data.
-:pop_queue
+:pop_queue_func
 	set push, z
 	set z, sp
 	add z, 2
@@ -104,9 +125,7 @@
 	ife [a+2], b
 		set [a+2], 0xFFFF	; If last item, null last link.
 
-	set push, b
-		jsr mem_free
-	set b, pop
+	mem_free (b)
 
 	:.exit
 	set b, pop
@@ -120,7 +139,7 @@
 ; SP+0 		: Data to queue.
 ; Output
 ; SP+0 		: 0xFFFF if error, else 0x0.
-:push_queue
+:push_queue_func
 	set push, z
 	set z, sp
 	add z, 2
@@ -130,9 +149,7 @@
 
 	set i, [z+1] 		; I = queue header.
 	
-	set push, 2
-		jsr mem_alloc
-	set a, pop 		; A = new item.
+	mem_alloc(2, a) ; A = new item.
 
 	ifn a, 0xFFFF
 		set pc, .no_error

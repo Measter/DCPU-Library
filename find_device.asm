@@ -1,9 +1,20 @@
-; --------------------------------------------
+; -----------------------
 ; Title:   Find Device
 ; Author:  Measter
-; Date:    04/11/2012
-; Version: 1.0
-; --------------------------------------------
+; Date:	   2013/10/29
+; -----------------------
+
+; Revisions
+; 1  :  Initial Release.
+; 2  :  Added macro.
+
+.macro find_device (byte1, byte2, out)
+	set push, byte1
+	set push, byte2
+		jsr find_device_func
+	set out, pop
+	add sp, 1
+.endmacro
 
 ; Queries the hardware for the given ID
 ; Input
@@ -12,7 +23,7 @@
 ; Output
 ; SP+0		: If found, returns address.
 ;			: If not found, returns 0xFFFF.
-:find_device
+:find_device_func
 	set push, z
 	set z, sp
 	add z, 2

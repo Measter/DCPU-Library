@@ -1,9 +1,22 @@
 ; --------------------------------------------
 ; Title:   DWard Maths - Division Module
 ; Author:  Measter
-; Date:    02/11/2012
-; Version: 1.0a
+; Date:    2013/10/29
 ; --------------------------------------------
+
+; Revisions
+; 1  :  Initial Release.
+; 2  :  Added macro.
+
+.macro dword_div ( fir1, fir2, sec, res1, res2 )
+	set push, fir1
+	set push, fir2
+	set push, sec
+		jsr dword_div_func
+	add sp, 1
+	set res2, pop
+	set res1, pop
+.endmacro
 
 ; Divide a 32-bit by a 16-bit number.
 ; Input
@@ -15,7 +28,7 @@
 ; SP+1 			: Right half of result.
 ; SP+2 			: Left half of result.
 ; EX 			: Non-Zero indicates a remainder.
-:dword_div
+:dword_div_func
 	set push, z
 	set z, sp
 	add z, 2

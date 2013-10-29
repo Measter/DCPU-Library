@@ -1,14 +1,23 @@
 ; -----------------------
 ; Title: 	Random Number Generator.
 ; Author: 	Measter
-; Date:		14/09/13
-; 
+; Date:		2013/10/29
+; -----------------------
+
 ; Revisions
 ; 1  -  Initial release.
 ; 2  -  Only include dword_mul instead of entire maths library.
-; -----------------------
+; 3  -  Added macros.
 
 .include <maths/dword_mul.asm>
+
+.macro set_seed(seed)
+	set [rand_seed], seed
+.endmacro
+.macro rand(dest)
+	jsr rand_func
+	set dest, [rand_seed]
+.endmacro
 
 ; Seed for the generator.
 :rand_seed
@@ -19,18 +28,11 @@
 ;	[rand_seed] : Seed.
 ; Output
 ;	[rand_seed] : Result.
-:rand
+:rand_func
 	set push, a
 	set push, b
 
-	set push, 0x015A
-	set push, 0x4E35
-	set push, 0x0000
-	set push, [rand_seed]
-		jsr dword_mul
-	add sp, 2
-	set b, pop
-	set a, pop
+	dword_mul(0x015A, 0x4E35, 0x0000, [rand_seed], a, b)
 
 	add b, 1
 	ife ex, 0x1

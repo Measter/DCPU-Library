@@ -1,9 +1,23 @@
 ; --------------------------------------------
 ; Title:   DWard Maths - Addition Module
 ; Author:  Measter
-; Date:    02/11/2012
-; Version: 1.0a
+; Date:    2013/10/29
 ; --------------------------------------------
+
+; Revisions
+; 1  :  Initial Release.
+; 2  :  Added macro.
+
+.macro dword_add ( fir1, fir2, sec1, sec2, res1, res2 )
+	set push, fir1
+	set push, fir2
+	set push, sec1
+	set push, sec2
+		jsr dword_add_func
+	add sp, 2
+	set res2, pop
+	set res1, pop
+.endmacro
 
 ; Adds two 32-bit numbers. Big Endian.
 ; Input
@@ -16,7 +30,7 @@
 ; SP+2			: Right half of result.
 ; SP+3			: Left half of result.
 ; EX			: Same result as expected from ADD.
-:dword_add
+:dword_add_func
 	set push, z
 	set z, sp
 	add z, 2

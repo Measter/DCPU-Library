@@ -1,8 +1,20 @@
 ; -----------------------
 ; Title: 	Memory Copy
 ; Author: 	Measter
-; Date:		2013/10/24
+; Date:		2013/10/29
 ; -----------------------
+
+; Revisions
+; 1  :  Initial Release.
+; 2  :  Added macro.
+
+.macro mem_copy ( source, dest, len )
+	set push, source
+	set push, dest
+	set push, len
+		jsr mem_copy_func
+	add sp, 3
+.endmacro
 
 ; Copies one section of memory to another.
 ; Takes no account of overlap.
@@ -10,7 +22,7 @@
 ; SP+2 		: Source location.
 ; SP+1 		: Destination.
 ; SP+0 		: Length of memory to copy.
-:mem_copy
+:mem_copy_func
 	set push, z
 	set z, sp
 	add z, 2
