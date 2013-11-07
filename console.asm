@@ -38,6 +38,7 @@
 ; +6 		: End line. Both this and the above are 0-indexed.
 ; +7 		: Line length.
 ; +8		: Column offset.
+; +9 		: Cursor Position.
 
 ; Scrolls the lines of the buffer up by 1
 ; Input
@@ -85,6 +86,8 @@
 			set pc, .line_loop_start
 			:.line_loop_end
 
+		set [z+9], 0 		; Reset cursor.
+
 	set y, pop
 	set x, pop
 	set j, pop
@@ -118,26 +121,44 @@
 		bor b, [a+4]		; Blink
 		shl b, 7
 
-		set x, 0
+		set x, [a+9]
 		set i, 32
 		mul i, [a+6]		; Find end line offset.
 		add i, [a+1]		; Add buffer address.
-		add i, [a+8]		; Add column offset. I = Start of end line.
+		add i, [a+8]		; Add column offset.
+		add i, x 			; Add cursor offset. I = Start of write position.
 		set j, [z+1]		; Output string address.
 		:.char_loop_start
-			ife [j], 0
-				set pc, .char_loop_end
+			ife [j], 0 		; Null
+				set pc, .char_loop_exit
+			ifl x, [a+7] 	; End of line
+				set pc, .print
 
+			; Scroll display.
+			console_scroll_buffer(a)
+			; Reset the start column.
+			set i, 32
+			mul i, [a+6]
+			add i, [a+1]
+			add i, [a+8]
+			; Reset column.
+			set x, 0
+
+			:.print
 			sti [i], [j]
-			bor [i-1], b
-
+			bor [i-1], b			
+		
 			add x, 1
-			ifl x, [a+7] 	; End of line check.
-				set pc, .char_loop_start
-			:.char_loop_end
+			set pc, .char_loop_start
+		:.char_loop_exit
 
-		ife x, [a+7]		; End of line check.
-			set pc, .end
+		set [a+9], x
+		
+		ifl x, [a+7]		; End of line check.
+			set pc, .clear_loop_start
+
+		set [a+9], 0
+		set pc, .end
 
 		:.clear_loop_start
 			set [i], 32 	; Set character to Space.
