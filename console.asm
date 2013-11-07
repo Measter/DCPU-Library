@@ -15,9 +15,16 @@
 	add sp, 1
 .endmacro
 .macro console_write_line ( msg_ptr, cnsl_ptr)
+	console_scroll_buffer(cnsl_ptr)
 	set push, msg_ptr
 	set push, cnsl_ptr
-		jsr console_write_line_func
+		jsr console_write_func
+	add sp, 2
+.endmacro
+.macro console_write (msg_ptr, cnsl_ptr)
+	set push, msg_ptr
+	set push, cnsl_ptr
+		jsr console_write_func
 	add sp, 2
 .endmacro
 
@@ -90,7 +97,7 @@
 ; SP+1 			: Address to the ASCII values of the next line.
 ;				: 0-terminated string.
 ; SP+0 			: Address to the console data struct.
-:console_write_line_func
+:console_write_func
 	set push, z
 	set z, sp
 	add z, 2
@@ -99,9 +106,6 @@
 	set push, j
 	set push, x
 	set push, a
-
-		; Scroll the buffer.
-		console_scroll_buffer([z])
 
 		set a, [z]
 		; A = Console data struct address.
