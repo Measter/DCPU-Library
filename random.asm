@@ -18,6 +18,15 @@
 	jsr rand_func
 	set dest, [rand_seed]
 .endmacro
+.macro rand_range(min, max, dest)
+	set push, a
+	set a, max
+	sub a, min
+	rand(dest)
+	mod dest, a
+	add dest, min
+	set a, pop
+.endmacro
 
 ; Seed for the generator.
 :rand_seed
