@@ -9,6 +9,7 @@
 ; 2  :  Generalised function.
 ; 3  :  Added macro.
 ; 4  :  Moved get_ordinal_suffix from date.asm.
+; 5  :  Made get_ordinal_suffix_func correctly handle numbers > 100.
 
 .macro int_text_conv (buffer, value, base)
 	set push, buffer
@@ -115,6 +116,8 @@
 	set push, a
 
 	set a, [z]
+
+	mod a, 100
 
 	ife a, 11
 		set pc, .first
