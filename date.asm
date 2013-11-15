@@ -6,6 +6,8 @@
 
 ; Revisions
 ; 1  :  Initial Release.
+; 2  :  Added date_get_day, date_get_ordinal_suffix.
+; 3  :  moved date_get_ordinal_suffix to int_text_conv.asm
 
 .macro date_from_ordinal (day_num, is_leap, d_dest, m_dest)
 	set push, day_num
@@ -34,11 +36,6 @@
 		jsr date_get_day_func
 	set dest, pop
 	add sp, 2
-.endmacro
-.macro date_get_ordinal_suffix (day, dest)
-	set push, day
-		jsr date_get_ordinal_suffix_func
-	set dest, pop
 .endmacro
 
 .macro get_month_string (id)
@@ -249,58 +246,12 @@
 	set z, pop
 	set pc, pop
 
-; Input
-; +0 	: Day.
-; Output
-; +0 	: Suffix Pointer.
-:date_get_ordinal_suffix_func
-	set push, z
-	set z, sp
-	add z, 2
-	set push, a
 
-	set a, [z]
-
-	ife a, 11
-		set pc, .first
-	ife a, 12
-		set pc, .first
-	ife a, 13
-		set pc, .first
-
-	mod a, 10
-
-	set [z], 0
-	ife a, 1
-		set [z], 1
-	ife a, 2
-		set [z], 2
-	ife a, 3
-		set [z], 3
-
-	set pc, .after
-
-	:.first
-	set [z], 0
-
-	:.after
-	mul [z], 3
-	add [z], date_ordinal_suffix
-	
-	set a, pop
-	set z, pop
-	set pc, pop
 
 :date_month_amounts
 	dat 0,31,59,90,120,151,181,212,243,273,304,334
 :date_month_leap_amounts
 	dat 0,31,60,91,121,152,182,213,244,274,305,335
-
-:date_ordinal_suffix
-	.asciiz "th"
-	.asciiz "st"
-	.asciiz "nd"
-	.asciiz "rd"
 
 :date_day_strings
 	.asciiz "Sunday"

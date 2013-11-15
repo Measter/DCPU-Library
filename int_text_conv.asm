@@ -8,6 +8,7 @@
 ; 1  :  Initial Release.
 ; 2  :  Generalised function.
 ; 3  :  Added macro.
+; 4  :  Moved get_ordinal_suffix from date.asm.
 
 .macro int_text_conv (buffer, value, base)
 	set push, buffer
@@ -15,6 +16,11 @@
 	set push, base
 		jsr int_text_conv_func
 	add sp, 3
+.endmacro
+.macro get_ordinal_suffix (val, dest)
+	set push, val
+		jsr get_ordinal_suffix_func
+	set dest, pop
 .endmacro
 
 ; Converts a value to ASCII output.
@@ -97,3 +103,51 @@
 	set a, pop
 	set z, pop
 	set pc, pop
+
+; Input
+; +0 	: value.
+; Output
+; +0 	: Suffix Pointer.
+:get_ordinal_suffix_func
+	set push, z
+	set z, sp
+	add z, 2
+	set push, a
+
+	set a, [z]
+
+	ife a, 11
+		set pc, .first
+	ife a, 12
+		set pc, .first
+	ife a, 13
+		set pc, .first
+
+	mod a, 10
+
+	set [z], 0
+	ife a, 1
+		set [z], 1
+	ife a, 2
+		set [z], 2
+	ife a, 3
+		set [z], 3
+
+	set pc, .after
+
+	:.first
+	set [z], 0
+
+	:.after
+	mul [z], 3
+	add [z], ordinal_suffix_strings
+	
+	set a, pop
+	set z, pop
+	set pc, pop
+
+:ordinal_suffix_strings
+	.asciiz "th"
+	.asciiz "st"
+	.asciiz "nd"
+	.asciiz "rd"
