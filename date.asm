@@ -9,6 +9,7 @@
 ; 2  :  Added date_get_day, date_get_ordinal_suffix.
 ; 3  :  moved date_get_ordinal_suffix to int_text_conv.asm
 ; 4  :  Added calendar drawing.
+; 5  :  Fixed error in month length selection.
 
 .include <int_text_conv.asm>
 
@@ -334,6 +335,7 @@
 
 	; Draw month.
 	set j, [z]
+	sub j, 1
 	add j, date_month_name_lengths
 	set j, [j]
 	; J = Month name length
