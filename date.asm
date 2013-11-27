@@ -10,6 +10,7 @@
 ; 3  :  moved date_get_ordinal_suffix to int_text_conv.asm
 ; 4  :  Added calendar drawing.
 ; 5  :  Fixed error in month length selection.
+; 6  :  Fixed error in doomsday calculation in date_get_day_func.
 
 .include <int_text_conv.asm>
 
@@ -206,19 +207,25 @@
 	mul b, 5
 	mod b, 7
 	add b, 2
+	mod b, 7
 	; B = Anchor day.
 
 	; Find doomsday. Uses Odd+11 method.
 	set a, [z+2]
 	mod a, 100
 	set c, a
+
 	mod c, 2
 	ife c, 1
 		add a, 11
+
 	div a, 2
+
 	set c, a
+	mod c, 2
 	ife c, 1
 		add a, 11
+
 	mod a, 7
 	set c, 7
 	sub c, a
