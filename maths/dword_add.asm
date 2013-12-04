@@ -14,7 +14,8 @@
 	set push, sec1
 	set push, sec2
 		jsr dword_add_func
-	add sp, 2
+	set res2, pop 	; Clear stack without adding.
+	set res2, pop 	; Clear stack without adding.
 	set res2, pop
 	set res1, pop
 .endmacro

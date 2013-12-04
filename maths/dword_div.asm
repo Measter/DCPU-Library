@@ -13,7 +13,7 @@
 	set push, fir2
 	set push, sec
 		jsr dword_div_func
-	add sp, 1
+	set res2, pop 	; Clear stack without adding.
 	set res2, pop
 	set res1, pop
 .endmacro
