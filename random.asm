@@ -1,13 +1,14 @@
 ; -----------------------
 ; Title: 	Random Number Generator.
 ; Author: 	Measter
-; Date:		2013/10/29
+; Date:		2013/12/05
 ; -----------------------
 
 ; Revisions
 ; 1  -  Initial release.
 ; 2  -  Only include dword_mul instead of entire maths library.
 ; 3  -  Added macros.
+; 4  -  rand_range macro no longer uses the A register.
 
 .include <maths/dword_mul.asm>
 
@@ -19,13 +20,13 @@
 	set dest, [rand_seed]
 .endmacro
 .macro rand_range(min, max, dest)
-	set push, a
-	set a, max
-	sub a, min
-	rand(dest)
-	mod dest, a
-	add dest, min
-	set a, pop
+	sub sp, 1
+		set [sp], max
+		sub [sp], min
+		rand(dest)
+		mod dest, [sp]
+		add dest, min
+	add sp, 1
 .endmacro
 
 ; Seed for the generator.
